@@ -1,8 +1,6 @@
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.function.Consumer;
 
 public class Client extends Thread{
@@ -28,14 +26,25 @@ public class Client extends Thread{
 			System.out.println("Error in Client");
 		}
 
-		while(true) {
+		while (true) {
 			try {
 				String message = in.readObject().toString();
 				callback.accept(message);
-			}
-			catch(Exception e) {
+			} catch (EOFException | SocketException e) {
+				System.out.println("Client disconnected");
+				break;
+			} catch (Exception e) {
 				System.out.println("Error in Client");
 			}
+		}
+
+	}
+
+	public void close() {
+		try {
+			socketClient.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
