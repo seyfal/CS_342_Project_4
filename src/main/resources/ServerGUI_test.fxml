@@ -1,0 +1,12 @@
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane prefHeight="400.0" prefWidth="500.0" style="-fx-background-color: #1dbb33;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <ListView fx:id="listItems" />
+    </center>
+    <padding>
+        <Insets bottom="70.0" left="70.0" right="70.0" top="70.0" />
+    </padding>
+</BorderPane>

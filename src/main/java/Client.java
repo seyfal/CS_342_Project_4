@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class Client extends Thread{
@@ -55,5 +56,22 @@ public class Client extends Thread{
 			e.printStackTrace();
 		}
 	}
+
+/*
+	public void broadcastClientList() {
+		ArrayList<String> clientList = new ArrayList<>();
+		for (Server.ClientThread client : clients) {
+			clientList.add("Client #" + client.count);
+		}
+
+		for (Server.ClientThread client : clients) {
+			try {
+				client.out.writeObject(clientList);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+*/
 
 }

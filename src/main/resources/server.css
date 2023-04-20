@@ -1,0 +1,53 @@
+.root {
+    -fx-base: #ffffff;
+    -fx-background-color: #f2f2f2;
+}
+
+.menu-bar {
+    -fx-background-color: linear-gradient(to bottom, #5c87b2 0%, #5c87b2 100%);
+}
+
+.menu-bar .label {
+    -fx-text-fill: white;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 14px;
+}
+
+.menu-item .label {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 14px;
+}
+
+.list-view {
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.list-cell {
+    -fx-padding: 8px;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #5c87b2;
+}
+
+.list-cell:filled:selected .label {
+    -fx-text-fill: white;
+}
+
+.toggle-button {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: linear-gradient(to bottom, #5c87b2 0%, #5c87b2 100%);
+    -fx-text-fill: white;
+    -fx-border-color: #5c87b2;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.toggle-button:selected {
+    -fx-background-color: linear-gradient(to bottom, #f2f2f2 0%, #f2f2f2 100%);
+    -fx-text-fill: #5c87b2;
+}
