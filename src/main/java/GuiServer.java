@@ -152,11 +152,11 @@ public class GuiServer extends Application {
 
 		this.serverChoice.setOnAction(e -> {
 			try {
-				Parent serverRoot = FXMLLoader.load(getClass().getResource("ServerGUI_test.fxml"));
+				Parent serverRoot = FXMLLoader.load(getClass().getResource("ServerGUI.fxml"));
 				listItems = (ListView<String>) serverRoot.lookup("#listItems");
 				Scene serverScene = new Scene(serverRoot, 500, 400);
 				primaryStage.setScene(serverScene);
-				primaryStage.setTitle("This is the Server");
+				primaryStage.setTitle("Server");
 				serverConnection = new Server(data -> {
 					Platform.runLater(() -> {
 						listItems.getItems().add(data.toString());
