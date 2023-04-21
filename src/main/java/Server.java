@@ -1,3 +1,5 @@
+import javafx.application.Platform;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -10,10 +12,13 @@ public class Server {
 
 	ArrayList<ClientThread> clients = new ArrayList<>();
 	private final Consumer<Serializable> callback;
+	private ServerController serverController;
+
 	TheServer server;
 	int count = 1;
 
-	Server(Consumer<Serializable> call) {
+	public Server(ServerController serverController, Consumer<Serializable> call) {
+		this.serverController = serverController;
 		callback = call;
 		server = new TheServer();
 		server.start();
@@ -90,6 +95,9 @@ public class Server {
 					String data = in.readObject().toString();
 					callback.accept("client: " + count + " sent: " + data);
 					updateClients("client #" + count + " said: " + data);
+					Platform.runLater(() -> {
+						serverController.addMessage(data.toString());
+					});
 				} catch (Exception e) {
 					callback.accept("OOOPs...Something wrong with the socket from client: " + count + "....closing down!");
 					updateClients("Client #" + count + " has left the server!");

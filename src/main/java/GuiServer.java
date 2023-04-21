@@ -1,115 +1,3 @@
-//import java.util.HashMap;
-//import javafx.application.Application;
-//import javafx.application.Platform;
-//import javafx.event.EventHandler;
-//import javafx.geometry.Insets;
-//import javafx.scene.Scene;
-//import javafx.scene.control.Button;
-//import javafx.scene.control.ListView;
-//import javafx.scene.control.TextField;
-//import javafx.scene.layout.BorderPane;
-//import javafx.scene.layout.HBox;
-//import javafx.scene.layout.VBox;
-//import javafx.stage.Stage;
-//import javafx.stage.WindowEvent;
-//
-//public class GuiServer extends Application {
-//
-//	TextField c1;
-//	Button serverChoice, clientChoice, b1;
-//	HashMap<String, Scene> sceneMap;
-//	HBox buttonBox;
-//	VBox clientBox;
-//	Scene startScene;
-//	BorderPane startPane;
-//	Server serverConnection;
-//	Client clientConnection;
-//	ListView<String> listItems, listItems2;
-//
-//	public static void main(String[] args) {
-//		launch(args);
-//	}
-//
-//	@Override
-//	public void start(Stage primaryStage) {
-//		primaryStage.setTitle("The Networked Client/Server GUI Chat");
-//		this.serverChoice = new Button("Server");
-//		this.serverChoice.setStyle("-fx-pref-width: 300px");
-//		this.serverChoice.setStyle("-fx-pref-height: 300px");
-//
-//		this.serverChoice.setOnAction(e -> {
-//			primaryStage.setScene(sceneMap.get("server"));
-//			primaryStage.setTitle("This is the Server");
-//			serverConnection = new Server(data -> {
-//				Platform.runLater(() -> {
-//					listItems.getItems().add(data.toString());
-//				});
-//			});
-//		});
-//
-//		this.clientChoice = new Button("Client");
-//		this.clientChoice.setStyle("-fx-pref-width: 300px");
-//		this.clientChoice.setStyle("-fx-pref-height: 300px");
-//
-//		this.clientChoice.setOnAction(e -> {
-//			primaryStage.setScene(sceneMap.get("client"));
-//			primaryStage.setTitle("This is a client");
-//			clientConnection = new Client(data -> {
-//				Platform.runLater(() -> {
-//					listItems2.getItems().add(data.toString());
-//				});
-//			});
-//			clientConnection.start();
-//		});
-//		this.buttonBox = new HBox(400, serverChoice, clientChoice);
-//		startPane = new BorderPane();
-//		startPane.setPadding(new Insets(70));
-//		startPane.setCenter(buttonBox);
-//		startScene = new Scene(startPane, 800, 800);
-//		listItems = new ListView<>();
-//		listItems2 = new ListView<>();
-//		c1 = new TextField();
-//		b1 = new Button("Send");
-//		b1.setOnAction(e -> {
-//			clientConnection.send(c1.getText());
-//			c1.clear();
-//		});
-//		sceneMap = new HashMap<>();
-//		sceneMap.put("server", createServerGui());
-//		sceneMap.put("client", createClientGui());
-//
-//		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-//			@Override
-//			public void handle(WindowEvent t) {
-//				if (serverConnection != null) {
-//					serverConnection.close();
-//				}
-//				if (clientConnection != null) {
-//					clientConnection.close();
-//				}
-//				Platform.exit();
-//				System.exit(0);
-//			}
-//		});
-//		primaryStage.setScene(startScene);
-//		primaryStage.show();
-//	}
-//
-//	public Scene createServerGui() {
-//		BorderPane pane = new BorderPane();
-//		pane.setPadding(new Insets(70));
-//		pane.setStyle("-fx-background-color: coral");
-//		pane.setCenter(listItems);
-//		return new Scene(pane, 500, 400);
-//	}
-//
-//	public Scene createClientGui() {
-//		clientBox = new VBox(10, c1,b1,listItems2);
-//		clientBox.setStyle("-fx-background-color: blue");
-//		return new Scene(clientBox, 400, 300);
-//	}
-//
-//}
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -120,23 +8,23 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
 import java.io.IOException;
 
 public class GuiServer extends Application {
 
-	Button serverChoice, clientChoice, b1;
+	Button serverChoice, clientChoice;
 	HBox buttonBox;
 	Scene startScene;
 	BorderPane startPane;
 	Server serverConnection;
 	Client clientConnection;
-	ListView<String> listItems, listItems2;
+	ListView<String> listItems;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -144,64 +32,125 @@ public class GuiServer extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-		primaryStage.setTitle("The Networked Client/Server GUI Chat");
+		primaryStage.setTitle("Pick");
 
-		this.serverChoice = new Button("Server");
-		this.serverChoice.setStyle("-fx-pref-width: 300px");
-		this.serverChoice.setStyle("-fx-pref-height: 300px");
+		// Create the serverChoice button
+		this.serverChoice = new Button();
+		this.serverChoice.setMinSize(60, 60);
+		this.serverChoice.setMaxSize(60, 60);
 
+		// Set the style class for the serverChoice button
+		serverChoice.getStyleClass().add("button");
+
+		// Set the graphic for the serverChoice button
+		Image serverImage = new Image(getClass().getResourceAsStream("server.png"));
+		ImageView serverImageView = new ImageView(serverImage);
+		serverImageView.setFitWidth(50); // Set the desired width
+		serverImageView.setFitHeight(50); // Set the desired height
+		serverChoice.setGraphic(serverImageView);
+
+		// Handle the serverChoice button action
 		this.serverChoice.setOnAction(e -> {
 			try {
-				Parent serverRoot = FXMLLoader.load(getClass().getResource("ServerGUI.fxml"));
-				listItems = (ListView<String>) serverRoot.lookup("#listItems");
-				Scene serverScene = new Scene(serverRoot, 500, 400);
+				// load the scene graph from the FXML file
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("ServerGUI.fxml"));
+
+				// serverRoot is the root of the scene graph
+				Parent serverRoot = loader.load();
+
+				// serverController is the controller of the scene graph
+				ServerController serverController = loader.getController();
+
+				// listItems is the ListView in the scene graph
+				listItems = serverController.serverListView;
+
+				// serverScene is the scene graph
+				Scene serverScene = new Scene(serverRoot, 600, 600);
+
+				// set the scene and title
 				primaryStage.setScene(serverScene);
 				primaryStage.setTitle("Server");
-				serverConnection = new Server(data -> {
+
+				// create the server connection
+				serverConnection = new Server(serverController, data -> {
+					// update the ListView on the JavaFX Application Thread
 					Platform.runLater(() -> {
+						// add the data to the ListView
 						listItems.getItems().add(data.toString());
 					});
 				});
+
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
 		});
 
-		this.clientChoice = new Button("Client");
-		this.clientChoice.setStyle("-fx-pref-width: 300px");
-		this.clientChoice.setStyle("-fx-pref-height: 300px");
+		// Create the clientChoice button
+		this.clientChoice = new Button();
+		this.clientChoice.setMinSize(60, 60);
+		this.clientChoice.setMaxSize(60, 60);
 
+		// Set the style class for the clientChoice button
+		clientChoice.getStyleClass().add("button");
+
+		// Set the graphic for the clientChoice button
+		Image clientImage = new Image(getClass().getResourceAsStream("client.png"));
+		ImageView clientImageView = new ImageView(clientImage);
+		clientImageView.setFitWidth(50); // Set the desired width
+		clientImageView.setFitHeight(50); // Set the desired height
+		clientChoice.setGraphic(clientImageView);
+
+		// Handle the clientChoice button action
 		this.clientChoice.setOnAction(e -> {
 			try {
-				Parent clientRoot = FXMLLoader.load(getClass().getResource("ClientGUI_test.fxml"));
-				listItems2 = (ListView<String>) clientRoot.lookup("#listItems2");
-				TextField c1 = (TextField) clientRoot.lookup("#c1");
-				Button b1 = (Button) clientRoot.lookup("#b1");
+				// load the scene graph from the FXML file
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("ClientGUI_test.fxml"));
 
-				b1.setOnAction(event -> {
-					clientConnection.send(c1.getText());
-					c1.clear();
-				});
+				// clientRoot is the root of the scene graph
+				Parent clientRoot = loader.load();
 
-				Scene clientScene = new Scene(clientRoot, 400, 300);
+				// clientController is the controller of the scene graph
+				ClientController clientController = loader.getController();
+
+				// handle send button action
+//				clientController.sendMessageButton.setOnAction(event -> {
+//					clientController.serverConnection.send(clientController.messageTextField.getText());
+//					clientController.messageTextField.clear();
+//				});
+
+				// clientScene is the scene graph
+				Scene clientScene = new Scene(clientRoot, 517, 669);
+
+				// set the scene and title
 				primaryStage.setScene(clientScene);
 				primaryStage.setTitle("This is a client");
-				clientConnection = new Client(data -> {
+
+				clientController.serverConnection = new Client(data -> {
 					Platform.runLater(() -> {
-						listItems2.getItems().add(data.toString());
+						clientController.messageListView.getItems().add(data.toString());
 					});
 				});
-				clientConnection.start();
+
+				clientController.serverConnection.start();
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
 		});
 
-		this.buttonBox = new HBox(400, serverChoice, clientChoice);
+		this.buttonBox = new HBox(50, serverChoice, clientChoice);
 		startPane = new BorderPane();
+
+		startPane.setStyle("-fx-background-color: #ffffff;");
+		buttonBox.setStyle("-fx-background-color: #ffffff;");
+
 		startPane.setPadding(new Insets(70));
 		startPane.setCenter(buttonBox);
-		startScene = new Scene(startPane, 800, 800);
+		BorderPane.setAlignment(buttonBox, javafx.geometry.Pos.CENTER);
+		BorderPane.setMargin(buttonBox, new Insets(50));
+		startScene = new Scene(startPane, 400, 350);
+
+		// Load the CSS file
+		startScene.getStylesheets().add(getClass().getResource("GuiServer.css").toExternalForm());
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
