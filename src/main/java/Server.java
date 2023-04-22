@@ -62,18 +62,21 @@ public class Server {
 		int count;
 		ObjectInputStream in;
 		ObjectOutputStream out;
+		User user;
 
 		ClientThread(Socket s, int count) {
 			this.connection = s;
 			this.count = count;
 		}
 
-		public void updateClients(String message) {
-			for (ClientThread t : clients) {
-				try {
-					t.out.writeObject(message);
-				} catch (Exception e) {
-					System.out.println("Error in updateClients");
+		public void handleMessage(Message message) {
+			for (ClientThread client : clients) {
+				if (message.getRecipients() == null || message.getRecipients().contains(client.user)) {
+					try {
+						client.out.writeObject(message);
+					} catch (Exception e) {
+						System.out.println("Error in handleMessage");
+					}
 				}
 			}
 		}
@@ -82,25 +85,29 @@ public class Server {
 
 			try {
 				in = new ObjectInputStream(connection.getInputStream());
+				try {
+					user = (User) in.readObject(); // Read the user object sent by the client
+				} catch (Exception e) {
+					System.out.println("Error reading user object from client");
+				}
 				out = new ObjectOutputStream(connection.getOutputStream());
-				connection.setTcpNoDelay(true);
 			} catch (Exception e) {
 				System.out.println("Streams not open");
 			}
 
-			updateClients("new client on server: client #" + count);
+			callback.accept("client has connected to server: " + user);
+			clients.add(this);
+			count++;
 
 			while (true) {
 				try {
-					String data = in.readObject().toString();
-					callback.accept("client: " + count + " sent: " + data);
-					updateClients("client #" + count + " said: " + data);
+					Message message = (Message) in.readObject();
+					handleMessage(message);
 					Platform.runLater(() -> {
-						serverController.addMessage(data.toString());
+						serverController.addMessage(message.toString());
 					});
 				} catch (Exception e) {
-					callback.accept("OOOPs...Something wrong with the socket from client: " + count + "....closing down!");
-					updateClients("Client #" + count + " has left the server!");
+					callback.accept("OOOPs...Something wrong with the socket from client: " + user + "....closing down!");
 					clients.remove(this);
 					break;
 				}

@@ -15,6 +15,8 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 
 public class GuiServer extends Application {
 
@@ -104,7 +106,7 @@ public class GuiServer extends Application {
 		this.clientChoice.setOnAction(e -> {
 			try {
 				// load the scene graph from the FXML file
-				FXMLLoader loader = new FXMLLoader(getClass().getResource("ClientGUI_test.fxml"));
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("ClientGUI.fxml"));
 
 				// clientRoot is the root of the scene graph
 				Parent clientRoot = loader.load();
@@ -112,26 +114,46 @@ public class GuiServer extends Application {
 				// clientController is the controller of the scene graph
 				ClientController clientController = loader.getController();
 
-				// handle send button action
+				// TODO: Old implementation. Keeping in case the new one doesn't work
+
+//				// handle send button action
 //				clientController.sendMessageButton.setOnAction(event -> {
-//					clientController.serverConnection.send(clientController.messageTextField.getText());
+//					User sender = /* sender User object */;
+//					List<User> recipients = /* recipients User objects */;
+//					String content = clientController.messageTextField.getText();
+//
+//					Message message = new Message(sender, recipients, content);
+//					clientController.serverConnection.send(message);
 //					clientController.messageTextField.clear();
 //				});
+
+				// TODO: End of old implementation
+
+				// TODO: New implementation. Not working yet
+
+				UserManager userManager = new UserManager(); // Create a new userManager
+				User clientUser = new User(); // Create a new user for the client
+				clientController.setUser(clientUser); // Pass the user to the clientController
+				clientController.setUserManager(userManager); // Pass the userManager to the clientController
+				clientController.initialize(); // Call the initialize method
+
+				// TODO: End of new implementation
 
 				// clientScene is the scene graph
 				Scene clientScene = new Scene(clientRoot, 517, 669);
 
 				// set the scene and title
 				primaryStage.setScene(clientScene);
-				primaryStage.setTitle("This is a client");
+				primaryStage.setTitle("Chat");
 
-				clientController.serverConnection = new Client(data -> {
+				clientController.serverConnection = new Client(clientUser, data -> {
 					Platform.runLater(() -> {
 						clientController.messageListView.getItems().add(data.toString());
 					});
 				});
 
 				clientController.serverConnection.start();
+
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}

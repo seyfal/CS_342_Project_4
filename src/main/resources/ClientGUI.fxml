@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="517.0" prefWidth="669.0" stylesheets="@client.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="517.0" prefWidth="669.0" stylesheets="@client.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ClientController">
     <children>
         <Label layoutX="29.0" layoutY="25.0" prefHeight="29.0" prefWidth="141.0" text="Connected Users">
             <font>

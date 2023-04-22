@@ -19,10 +19,15 @@ public class Client extends Thread {
 	ObjectOutputStream out; // Output stream for sending data
 	ObjectInputStream in; // Input stream for receiving data
 	private Consumer<Serializable> callback; // Callback function for receiving messages
+	private boolean started = false; // Add a new field
+	private User user;
+
 
 	// Constructor taking a callback function as an argument
-	Client(Consumer<Serializable> call) {
+	Client(User user, Consumer<Serializable> call) {
 		callback = call;
+		this.user = user;
+		this.socketClient = new Socket();
 	}
 
 	// Run method is called when the thread starts
@@ -33,6 +38,7 @@ public class Client extends Thread {
 
 			// Initialize ObjectOutputStream and ObjectInputStream for sending and receiving data
 			out = new ObjectOutputStream(socketClient.getOutputStream());
+			out.writeObject(user); // Send the user object to the server
 			in = new ObjectInputStream(socketClient.getInputStream());
 
 			// Set TCP No Delay for faster response times
@@ -45,7 +51,7 @@ public class Client extends Thread {
 		while (true) {
 			try {
 				// Read the message from the server and convert it to a String
-				String message = in.readObject().toString();
+				Message message = (Message) in.readObject();
 
 				// This is where we handle the message from the server
 
@@ -72,30 +78,23 @@ public class Client extends Thread {
 	}
 
 	// Send a message to the server
-	public void send(String data) {
+	public void send(Message message) {
 		try {
-			out.writeObject(data);
+			out.writeObject(message);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	// The commented code below would be used for broadcasting client list updates
-	// (if it were part of the Client class and not the Server class)
-    /*
-    public void broadcastClientList() {
-        ArrayList<String> clientList = new ArrayList<>();
-        for (Server.ClientThread client : clients) {
-            clientList.add("Client #" + client.count);
-        }
+	public User getUser() {
+		return user;
+	}
 
-        for (Server.ClientThread client : clients) {
-            try {
-                client.out.writeObject(clientList);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    */
+	// Add a new synchronized method to start the client
+	public synchronized void startClient() {
+		if (!started) {
+			started = true;
+			new Thread(this).start();
+		}
+	}
 }
