@@ -114,30 +114,9 @@ public class GuiServer extends Application {
 				// clientController is the controller of the scene graph
 				ClientController clientController = loader.getController();
 
-				// TODO: Old implementation. Keeping in case the new one doesn't work
-
-//				// handle send button action
-//				clientController.sendMessageButton.setOnAction(event -> {
-//					User sender = /* sender User object */;
-//					List<User> recipients = /* recipients User objects */;
-//					String content = clientController.messageTextField.getText();
-//
-//					Message message = new Message(sender, recipients, content);
-//					clientController.serverConnection.send(message);
-//					clientController.messageTextField.clear();
-//				});
-
-				// TODO: End of old implementation
-
-				// TODO: New implementation. Not working yet
-
-				UserManager userManager = new UserManager(); // Create a new userManager
 				User clientUser = new User(); // Create a new user for the client
 				clientController.setUser(clientUser); // Pass the user to the clientController
-				clientController.setUserManager(userManager); // Pass the userManager to the clientController
 				clientController.initialize(); // Call the initialize method
-
-				// TODO: End of new implementation
 
 				// clientScene is the scene graph
 				Scene clientScene = new Scene(clientRoot, 517, 669);
@@ -148,7 +127,7 @@ public class GuiServer extends Application {
 
 				clientController.serverConnection = new Client(clientUser, data -> {
 					Platform.runLater(() -> {
-						clientController.messageListView.getItems().add(data.toString());
+						clientController.handle(data);
 					});
 				});
 

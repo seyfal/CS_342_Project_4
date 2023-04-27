@@ -1,4 +1,6 @@
 // Import required packages
+import javafx.application.Platform;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
@@ -44,7 +46,7 @@ public class Client extends Thread {
 			// Set TCP No Delay for faster response times
 			socketClient.setTcpNoDelay(true);
 		} catch (Exception e) {
-			System.out.println("Error in Client");
+			System.out.println("Error in Client: socket connection");
 		}
 
 		// Keep running and listening for incoming messages
@@ -53,17 +55,21 @@ public class Client extends Thread {
 				// Read the message from the server and convert it to a String
 				Message message = (Message) in.readObject();
 
+				// Read the user object from the server
+				User user = (User) in.readObject();
+
 				// This is where we handle the message from the server
 
 				// Call the callback function with the received message
 				callback.accept(message);
+				callback.accept(user);
 			} catch (EOFException | SocketException e) {
 				// Handle disconnection from the server
 				System.out.println("Client disconnected");
 				break;
 			} catch (Exception e) {
 				// Handle other exceptions
-				System.out.println("Error in Client");
+				System.out.println("Error in Client: incoming messages while loop");
 			}
 		}
 	}
@@ -90,11 +96,4 @@ public class Client extends Thread {
 		return user;
 	}
 
-	// Add a new synchronized method to start the client
-	public synchronized void startClient() {
-		if (!started) {
-			started = true;
-			new Thread(this).start();
-		}
-	}
 }
