@@ -21,9 +21,8 @@ public class Client extends Thread {
 	ObjectOutputStream out; // Output stream for sending data
 	ObjectInputStream in; // Input stream for receiving data
 	private Consumer<Serializable> callback; // Callback function for receiving messages
-	private boolean started = false; // Add a new field
+	private volatile boolean running = true;
 	private User user;
-
 
 	// Constructor taking a callback function as an argument
 	Client(User user, Consumer<Serializable> call) {
@@ -47,22 +46,19 @@ public class Client extends Thread {
 			socketClient.setTcpNoDelay(true);
 		} catch (Exception e) {
 			System.out.println("Error in Client: socket connection");
+			running = false;
 		}
 
 		// Keep running and listening for incoming messages
 		while (true) {
 			try {
-				// Read the message from the server and convert it to a String
-				Message message = (Message) in.readObject();
-
-				// Read the user object from the server
-				User user = (User) in.readObject();
-
-				// This is where we handle the message from the server
-
-				// Call the callback function with the received message
-				callback.accept(message);
-				callback.accept(user);
+				Serializable data = (Serializable) in.readObject();
+				if (data instanceof Message) {
+					System.out.println("Message received: " + data);
+					callback.accept(data);
+				} else if (data instanceof UserManager) {
+					callback.accept(data);
+				}
 			} catch (EOFException | SocketException e) {
 				// Handle disconnection from the server
 				System.out.println("Client disconnected");
@@ -77,6 +73,7 @@ public class Client extends Thread {
 	// Close the socket connection
 	public void close() {
 		try {
+			running = false;
 			socketClient.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -86,14 +83,11 @@ public class Client extends Thread {
 	// Send a message to the server
 	public void send(Message message) {
 		try {
+			System.out.println("Message sent from the client class: " + message);
 			out.writeObject(message);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public User getUser() {
-		return user;
 	}
 
 }

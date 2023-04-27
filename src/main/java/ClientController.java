@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
  * It handles events such as button clicks and list view selections, manages
  * message sending and receiving, and updates the user interface accordingly.
  */
-public class ClientController implements Initializable {
+public class ClientController {
 
     @FXML
     private ListView<User> clientList;
@@ -54,16 +54,21 @@ public class ClientController implements Initializable {
             return;
         }
 
-        recipients.addUser(selectedUser);
-        System.out.println("Selected items: " + selectedUser);
+        if (recipients.getUsers().contains(selectedUser)) {
+            // deselect the user
+            recipients.removeUser(selectedUser);
+        } else {
+            recipients.addUser(selectedUser);
+            System.out.println("Selected items: " + selectedUser);
+        }
+        System.out.println("Current recipients list: " + recipients.getUsers());
     }
 
     /**
      * Handles the sending of a message when the send button is clicked.
      */
-    private void toggleButton() {
-        List<User> recipients = this.recipients.getUsers(); // Get the list of users for the recipients
 
+    private void toggleButton() {
         String content = messageTextField.getText(); // Get the content of the message
 
         if (content.isEmpty()) {
@@ -77,12 +82,16 @@ public class ClientController implements Initializable {
         messageTextField.clear();
     }
 
+    /**
+     * Handles received data, such as messages or user lists, and updates the
+     * user interface accordingly.
+     */
     public void handle(Serializable data) {
         if (data instanceof Message) {
             Message message = (Message) data;
 
             // message to string
-            String messageString = message.toString();
+            String messageString = message.printOut();
 
             // function that will update the UI
             updateMessageListView(messageString);
@@ -97,22 +106,28 @@ public class ClientController implements Initializable {
         }
     }
 
+    /**
+     * Sets the current user of the application.
+     */
     public void setUser(User user) {
         this.user = user;
     }
 
+    /**
+     * Updates the message list view with the provided message.
+     */
     public void updateMessageListView(String message) {
         messageListView.getItems().add(message);
     }
 
+    /**
+     * Updates the client list view with the provided list of users.
+     */
     public void updateClientList(List<User> users) {
+        // don't show the current user in the list
+        users.remove(user);
         ObservableList<User> observableList = FXCollections.observableArrayList(users);
         clientList.setItems(observableList);
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // TODO: empty
     }
 
 }

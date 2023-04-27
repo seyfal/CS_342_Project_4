@@ -24,15 +24,13 @@ import java.util.function.Consumer;
  */
 public class Server {
 
-	static int DEBUG = 1; // Set to 1 to enable debug messages
-
 	ArrayList<ClientThread> clients = new ArrayList<>(); // List of connected clients (ClientThread objects)
-	private List<User> users = new ArrayList<>(); 		 // List of users connected to the server
-	private final Consumer<Serializable> callback; 		 // Callback function for UI updates
-	private ServerController serverController; 			 // The ServerController instance for UI updates
+	private List<User> users = new ArrayList<>();          // List of users connected to the server
+	private final Consumer<Serializable> callback;          // Callback function for UI updates
+	private ServerController serverController;              // The ServerController instance for UI updates
 
-	TheServer server; 									 // The main server thread
-	int count = 1;	 									 // The client count
+	TheServer server;                                      // The main server thread
+	int count = 1;                                          // The client count
 
 	/**
 	 * Constructs a Server instance with the given callback function.
@@ -110,8 +108,8 @@ public class Server {
 	 */
 	class ClientThread extends Thread {
 
-		Socket connection;  		// The client connection ( Socket instance )
-		int count; 		   			// The client count
+		Socket connection;          // The client connection ( Socket instance )
+		int count;                        // The client count
 		ObjectInputStream in;
 		ObjectOutputStream out;
 		User user;
@@ -132,29 +130,46 @@ public class Server {
 		 *
 		 * @param message The Message instance to be sent.
 		 */
-		public void handleMessage(Message message) {
+		public synchronized void handleMessage(Message message) {
+			System.out.println("handleMessage called");
+			List<User> recipients = message.getRecipients(); // Get the list of recipients from the UserManager
+			System.out.println("Recipients: " + recipients);
+			User sender = message.getSender(); // Get the sender of the message
+			System.out.println("Sender: " + sender);
 			for (ClientThread client : clients) {
-				if (message.getRecipients() == null || message.getRecipients().contains(client.user)) {
+				// System.out.println("Checking client: " + client.user.toString());
+				// TODO - Fix this!!!!!
+//				if (!client.user.equals(sender) && (recipients == null || recipients.contains(client.user)))
 					try {
+						// Flush the stream
+						client.out.flush();
+						// Reset the ObjectOutputStream for the client
+						client.out.reset();
+						// Send the message to the client
 						client.out.writeObject(message);
-
-						 if (DEBUG == 1) {
-						 	System.out.println("Message sent to " + client.user.toString());
-						 }
-
+						// Update the Terminal
+						System.out.println("Message sent to " + client.user.toString());
 					} catch (Exception e) {
-						System.out.println("Error in handleMessage");
+						System.out.println("Error in handleMessage: " + e.getMessage());
 					}
-				}
-				// other options
+//				} else {
+					// System.out.println("Message not intended for client: " + client.user.toString());
+//				}
 			}
 		}
 
-		public void handleUser(List<User> users) {
+
+		public synchronized void handleUser(List<User> users) {
 			// create an instance of UserManager
 			UserManager userManager = new UserManager(users);
 			// send the list of users to the client
 			try {
+				System.out.println("Sending user list to client: " + userManager);
+				// Flush the stream
+				out.flush();
+				// Reset the ObjectOutputStream
+				out.reset();
+				// send the list of users to the client
 				out.writeObject(userManager);
 			} catch (Exception e) {
 				System.out.println("Error in handleUser");
@@ -176,7 +191,7 @@ public class Server {
 					user = (User) in.readObject();
 					// Update the list of users
 					users.add(user);
-					// Add this line after adding the new user to the list of users
+
 				} catch (Exception e) {
 					System.out.println("Error reading user object from client");
 				}
@@ -196,16 +211,21 @@ public class Server {
 			// Increment the client count
 			count++;
 
+			// handle sending the updated list of users to all clients
+			for (ClientThread client : clients) {
+				client.handleUser(users);
+			}
+
 			while (true) {
 				try {
 					// Read the message object sent by the client
 					Message message = (Message) in.readObject();
 
+					// TODO
+					System.out.println("Received message on server: " + message.toString());
+
 					// Handle the message including routing it to the appropriate recipients and sending
 					handleMessage(message);
-
-					// handle sending the updated list of users to all clients
-					handleUser(users);
 
 					// Send the message to the UI using the callback function
 					Platform.runLater(() -> {
@@ -220,8 +240,28 @@ public class Server {
 
 					// Remove the user from the list of users
 					users.remove(user);
+
+					// Close resources when the client disconnects
+					closeResources();
 					break;
 				}
+			}
+		}
+
+		// Method to close resources
+		private void closeResources() {
+			try {
+				if (in != null) {
+					in.close();
+				}
+				if (out != null) {
+					out.close();
+				}
+				if (connection != null) {
+					connection.close();
+				}
+			} catch (Exception e) {
+				System.out.println("Error closing resources: " + e.getMessage());
 			}
 		}
 	}

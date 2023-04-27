@@ -30,4 +30,15 @@ public class UserManager implements Serializable {
     public void addUser(User selectedUser) {
         users.add(selectedUser);
     }
+
+    public void removeUser(User selectedUser) {
+        users.remove(selectedUser);
+    }
+
+    @Override
+    public String toString() {
+        return "UserManager{" +
+                "users=" + users +
+                '}';
+    }
 }

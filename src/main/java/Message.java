@@ -10,7 +10,7 @@ import java.util.List;
 public class Message implements Serializable {
 
     private User sender;
-    private final List<User> recipients;
+    private final UserManager recipients;
     private String content;
 
     /**
@@ -19,7 +19,7 @@ public class Message implements Serializable {
      * @param recipients The list of recipients (List<User> object)
      * @param content The content of the message (String)
      */
-    public Message(User sender, List<User> recipients, String content) {
+    public Message(User sender, UserManager recipients, String content) {
         this.sender = sender;
         this.recipients = recipients;
         this.content = content;
@@ -38,7 +38,7 @@ public class Message implements Serializable {
      * @return List<User> object representing the recipients
      */
     public List<User> getRecipients() {
-        return recipients;
+        return recipients.getUsers();
     }
 
     /**
@@ -56,5 +56,10 @@ public class Message implements Serializable {
                 ", recipients=" + recipients +
                 ", content='" + content + '\'' +
                 '}';
+    }
+
+    public String printOut() {
+        return "From: " + sender + ": \n" +
+                content + "\n";
     }
 }
