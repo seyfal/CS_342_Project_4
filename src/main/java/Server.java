@@ -99,7 +99,14 @@ public class Server {
 			}
 		}
 	}
-
+	Boolean containsUser(Message message, User user) {
+		for (User u : message.getRecipients()) {
+			if (u.getId().equals(user.getId())) {
+				return true;
+			}
+		}
+		return false;
+	}
 	/**
 	 * ClientThread is an inner class representing the thread responsible for handling
 	 * individual client connections, processing incoming messages, and routing messages
@@ -131,15 +138,15 @@ public class Server {
 		 * @param message The Message instance to be sent.
 		 */
 		public synchronized void handleMessage(Message message) {
-			System.out.println("handleMessage called");
+			// System.out.println("handleMessage called");
 			List<User> recipients = message.getRecipients(); // Get the list of recipients from the UserManager
 			System.out.println("Recipients: " + recipients);
 			User sender = message.getSender(); // Get the sender of the message
-			System.out.println("Sender: " + sender);
+			// System.out.println("Sender: " + sender);
 			for (ClientThread client : clients) {
 				// System.out.println("Checking client: " + client.user.toString());
 				// TODO - Fix this!!!!!
-//				if (!client.user.equals(sender) && (recipients == null || recipients.contains(client.user)))
+				 if (!client.user.equals(sender) && (recipients == null || containsUser(message, client.user))){
 					try {
 						// Flush the stream
 						client.out.flush();
@@ -148,13 +155,13 @@ public class Server {
 						// Send the message to the client
 						client.out.writeObject(message);
 						// Update the Terminal
-						System.out.println("Message sent to " + client.user.toString());
+						// System.out.println("Message sent to " + client.user.toString());
 					} catch (Exception e) {
 						System.out.println("Error in handleMessage: " + e.getMessage());
 					}
-//				} else {
-					// System.out.println("Message not intended for client: " + client.user.toString());
-//				}
+				 } else {
+					 System.out.println("Message not intended for client: " + client.user.toString());
+				 }
 			}
 		}
 
@@ -205,9 +212,6 @@ public class Server {
 			// Update the UI using the callback function
 			callback.accept("client has connected to server: " + user);
 
-			// Add the ClientThread instance to the list of clients
-			clients.add(this);
-
 			// Increment the client count
 			count++;
 
@@ -240,6 +244,11 @@ public class Server {
 
 					// Remove the user from the list of users
 					users.remove(user);
+
+					// Remove the user from the list of users
+					for (ClientThread client : clients) {
+						client.handleUser(users);
+					}
 
 					// Close resources when the client disconnects
 					closeResources();

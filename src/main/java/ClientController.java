@@ -2,9 +2,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.util.List;
@@ -40,28 +40,45 @@ public class ClientController {
      */
     public void initialize() {
         sendMessageButton.setOnAction(event ->toggleButton());
-        clientList.setOnMouseClicked(event ->toggleListView());
-    }
+        clientList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        clientList.setCellFactory(lv -> {
+            ListCell<User> cell = new ListCell<User>() {
+                @Override
+                protected void updateItem(User item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item.toString());
+                        if (clientList.getSelectionModel().getSelectedItems().contains(item)) {
+                            setStyle("-fx-control-inner-background: #007bff; -fx-text-fill: white;");
+                        } else {
+                            setStyle("");
+                        }
+                    }
+                }
+            };
 
-    /**
-     * Handles the selection of a user from the client list.
-     */
-    private void toggleListView() {
-        User selectedUser = clientList.getSelectionModel().getSelectedItem();
+            cell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                clientList.requestFocus();
+                if (!cell.isEmpty()) {
+                    int index = cell.getIndex();
+                    if (clientList.getSelectionModel().getSelectedIndices().contains(index)) {
+                        clientList.getSelectionModel().clearSelection(index);
+                        recipients.removeUser(cell.getItem());
+                    } else {
+                        clientList.getSelectionModel().select(index);
+                        recipients.addUser(cell.getItem());
+                    }
+                    event.consume();
+                    System.out.println("Current recipients list: " + recipients.getUsers());
+                }
+            });
 
-        if (selectedUser == null) {
-            System.out.println("No user selected");
-            return;
-        }
+            return cell;
+        });
 
-        if (recipients.getUsers().contains(selectedUser)) {
-            // deselect the user
-            recipients.removeUser(selectedUser);
-        } else {
-            recipients.addUser(selectedUser);
-            System.out.println("Selected items: " + selectedUser);
-        }
-        System.out.println("Current recipients list: " + recipients.getUsers());
     }
 
     /**
