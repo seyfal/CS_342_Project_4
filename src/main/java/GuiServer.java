@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+/**
+*  The way the client works is you click on the client you want to
+*  send a message to and then type in the message and click send
+*/
 public class GuiServer extends Application {
 
 	Button serverChoice, clientChoice;
@@ -119,7 +123,7 @@ public class GuiServer extends Application {
 				clientController.initialize(); // Call the initialize method
 
 				// clientScene is the scene graph
-				Scene clientScene = new Scene(clientRoot, 517, 669);
+				Scene clientScene = new Scene(clientRoot, 669, 517);
 
 				// set the scene and title
 				primaryStage.setScene(clientScene);

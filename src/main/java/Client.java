@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 // Client class extending Thread to run in a separate thread
 
-/*
+/**
 This is a Client class that represents a client in a client-server chat application.
 The class extends Thread, allowing it to run concurrently with other parts of the program.
 The client connects to a server, receives messages from the server, and sends messages to

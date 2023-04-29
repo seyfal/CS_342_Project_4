@@ -47,4 +47,8 @@ public class User implements Serializable {
                 "id=" + id +
                 '}';
     }
+
+    public String youAre() {
+        return "You are " + getId();
+    }
 }

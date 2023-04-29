@@ -35,6 +35,10 @@ public class UserManager implements Serializable {
         users.remove(selectedUser);
     }
 
+    public String youAre(User user) {
+        return "You are " + user.getId();
+    }
+
     @Override
     public String toString() {
         return "UserManager{" +

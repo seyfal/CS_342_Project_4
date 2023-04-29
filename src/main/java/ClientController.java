@@ -4,11 +4,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * The ClientController class manages the user interface for a chat application.
@@ -28,6 +30,9 @@ public class ClientController {
 
     @FXML
     TextField messageTextField;
+
+    @FXML
+    Label clientName;
 
     public Client serverConnection;
     public UserManager recipients = new UserManager();
@@ -53,7 +58,8 @@ public class ClientController {
                         setText(item.toString());
                         if (clientList.getSelectionModel().getSelectedItems().contains(item)) {
                             setStyle("-fx-control-inner-background: #007bff; -fx-text-fill: white;");
-                        } else {
+                        }
+                        else {
                             setStyle("");
                         }
                     }
@@ -117,6 +123,7 @@ public class ClientController {
             System.out.println("Received message: " + message);
         } else if (data instanceof UserManager){
             currentUsers = (UserManager) data;
+            // currentUsers.removeUser(user);
             updateClientList(currentUsers.getUsers());
         } else {
             System.out.println("Received unknown object");
@@ -142,7 +149,7 @@ public class ClientController {
      */
     public void updateClientList(List<User> users) {
         // don't show the current user in the list
-        users.remove(user);
+        users.removeIf(u -> u.getId().equals(user.getId()));
         ObservableList<User> observableList = FXCollections.observableArrayList(users);
         clientList.setItems(observableList);
     }
