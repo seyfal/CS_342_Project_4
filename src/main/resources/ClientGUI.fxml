@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
@@ -11,9 +14,14 @@
                 <Font size="18.0" />
             </font>
         </Label>
-        <ListView fx:id="clientList" layoutX="23.0" layoutY="65.0" prefHeight="424.0" prefWidth="200.0" />
+        <ListView fx:id="clientList" layoutX="23.0" layoutY="65.0" prefHeight="314.0" prefWidth="200.0" />
         <Button fx:id="sendMessageButton" layoutX="594.0" layoutY="459.0" mnemonicParsing="false" text="Send" />
         <ListView fx:id="messageListView" layoutX="248.0" layoutY="22.0" prefHeight="417.0" prefWidth="396.0" />
         <TextField fx:id="messageTextField" layoutX="248.0" layoutY="459.0" prefHeight="27.0" prefWidth="339.0" promptText="Send Message" />
+      <Text layoutX="24.0" layoutY="404.0" lineSpacing="1.4" strokeType="OUTSIDE" strokeWidth="0.0" text="Sending a message is easy! Simply click on the user you wish to message, type in your message, and hit send. Need to message multiple users? Easy! Just select multiple clients from the list of connected users." wrappingWidth="197.06591796875">
+         <font>
+            <Font name="Arial" size="13.0" />
+         </font>
+      </Text>
     </children>
 </AnchorPane>
